@@ -102,22 +102,41 @@ def range (f : G₁ →* G₂) : Subgroup G₂ where
     -- ヒント: とりあえず`simp`して考えよう
     -- `∃ a : A, P a`を示したかったら、
     -- 条件を満たす`a`を探して`exists a`しよう
-    sorry
+    simp only [Set.mem_range]
+    use 1
+    simp only [map_one]
+
   mul_mem' := by
-    sorry
+    simp only [Set.mem_range, forall_exists_index]
+    intro a b
+    intro x ha y hb
+    use x * y
+    simp only [map_mul]
+    rw [ha, hb]
+
   inv_mem' := by
-    sorry
+    simp only [Set.mem_range, forall_exists_index, forall_apply_eq_imp_iff']
+    intro a
+    use a⁻¹
+    simp only [map_inv]
 
 /-- 群準同型`f : G₁ →* G₂`の核（`G₁`の部分群）。`f.ker`でアクセス可能。 -/
 def ker (f : G₁ →* G₂) : Subgroup G₁ where
   carrier := { a : G₁ | f a = 1 } -- このような直感的な記法が使える
   -- 部分群の公理を満たすことを示そう。
   one_mem' := by
-    sorry
+    simp only [Set.mem_setOf_eq, map_one]
+
   mul_mem' := by
-    sorry
+    simp only [Set.mem_setOf_eq, map_mul]
+    intro a b fa1 fb1
+    rw [fa1, fb1, mul_one]
+
   inv_mem' := by
-    sorry
+    simp
+    intro a fa1
+    rw [fa1]
+    simp only [inv_one]
 
 /-- 核に入ることと飛ばして`1`に行くことは同値。 -/
 @[simp]
@@ -141,11 +160,13 @@ instance : Top (Subgroup G) where
   top := {
     carrier := Set.univ -- これは`G`を`G`の部分集合とみなしたもの
     one_mem' := by
-      sorry
+      simp only [Set.mem_univ]
+
     mul_mem' := by
-      sorry
+      simp only [Set.mem_univ, forall_true_left, forall_const]
+
     inv_mem' := by
-      sorry
+      simp only [Set.mem_univ, forall_true_left, forall_const]
   }
 
 -- これは以下のように使える。`⊤`は`\top`で入力し、これはこの部分群が
@@ -157,11 +178,13 @@ instance : Bot (Subgroup G) where
   bot := {
     carrier := { 1 } -- `1`のみからなる一元集合
     one_mem' := by
-      sorry
+      simp only [Set.mem_singleton_iff]
+
     mul_mem' := by
-      sorry
+      simp only [Set.mem_singleton_iff, forall_eq_apply_imp_iff', mul_one, imp_self, forall_const]
+
     inv_mem' := by
-      sorry
+      simp only [Set.mem_singleton_iff, forall_eq, inv_one]
   }
 
 /-- 自明部分群`⊥`に属することと`1`なことは同値。 -/
@@ -179,8 +202,17 @@ variable {f : G₁ →* G₂}
 #check mul_inv_eq_one -- これが役立つかも
 theorem injective_iff_map_eq_one : Function.Injective f ↔ (∀ a, f a = 1 → a = 1) := by
   constructor
-  · sorry
-  · sorry
+  · intro hfinj
+    intro a fa1
+    apply hfinj
+    simp only [map_one]
+    apply fa1
+  · intro h
+    intro a b fafb
+    rw [← mul_inv_eq_one]
+    apply h
+    rw [map_mul, map_inv, fafb, mul_inv_self]
+  done
 
 namespace GroupHom
 
