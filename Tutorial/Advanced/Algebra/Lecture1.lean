@@ -309,7 +309,13 @@ theorem mul_mem {a b : G} : a ∈ H → b ∈ H → a * b ∈ H := H.mul_mem'
 theorem inv_mem {a : G} : a ∈ H → a⁻¹ ∈ H := H.inv_mem'
 
 theorem inv_mem_iff {a : G} : a⁻¹ ∈ H ↔ a ∈ H := by
-  sorry
+  constructor
+  . intro h
+    rw [← inv_inv a]
+    apply inv_mem h
+  . intro h
+    apply inv_mem h
+  done
 
 /-
 部分群が等しいとは`∈`が同値なとき。
@@ -328,11 +334,20 @@ def center (G) [Group G] : Subgroup G where
   carrier := { a : G | ∀ x : G, a * x = x * a}
   -- この部分集合が部分群の公理を満たすことを示そう。
   one_mem' := by
-    sorry
+    -- simp only [Set.mem_setOf_eq, one_mul, mul_one, forall_const]
+    rw [Set.mem_setOf]
+    intro x
+    rw [one_mul, mul_one]
   mul_mem' := by
-    sorry
+    intro a b
+    simp only [Set.mem_setOf]
+    intro ha hb x
+    rw [mul_assoc, hb, ← mul_assoc, ha, mul_assoc]
   inv_mem' := by
-    sorry
+    intro a
+    simp only [Set.mem_setOf]
+    intro ha x
+    rw [← inv_inv x, ← mul_inv_rev, ← ha, mul_inv_rev]
 
 /-
 下の`centrizer`と`noramlizer`は少し面倒で難しい。
