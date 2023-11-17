@@ -169,19 +169,30 @@ theorem mul_inv_cancel_left (a b : G) : a * (a⁻¹ * b) = b := by
 
 @[simp]
 theorem mul_inv_cancel_right (a b : G) : a * b * b⁻¹ = a := by
-  sorry
+  rw [mul_assoc]
+  simp only [mul_inv_self, mul_one]
 
 @[simp]
 theorem inv_mul_cancel_right (a b : G) : a * b⁻¹ * b = a := by
-  sorry
+  rw [mul_assoc]
+  simp only [inv_mul_self, mul_one]
 
 /-- 等しいかどうかは右から元をかけてチェックできる。 -/
 theorem mul_right_cancel (a : G) {x y : G} : x * a = y * a → x = y := by
-  sorry
+  intro h
+  calc
+    x = (x * a) * a⁻¹ := by simp only [mul_inv_cancel_right]
+    _ = (y * a) * a⁻¹ := by rw [h]
+    _ = y             := by simp only [mul_inv_cancel_right]
 
 /-- 左逆元の一意性 -/
 theorem inv_eq_of_mul_eq_one_left {a x : G} : x * a = 1 → a⁻¹ = x := by
-  sorry
+  intro h
+  calc
+    a⁻¹ = 1 * a⁻¹     := by simp only [one_mul]
+    _ = (x * a) * a⁻¹ := by rw [h]
+    _ = x             := by simp only [mul_inv_cancel_right]
+
 
 -- その変種。後で便利かも。
 theorem eq_inv_of_mul_eq_one_left {a x : G} : x * a = 1 → x = a⁻¹ :=
@@ -190,26 +201,52 @@ theorem eq_inv_of_mul_eq_one_left {a x : G} : x * a = 1 → x = a⁻¹ :=
 @[simp]
 theorem inv_one : (1 : G)⁻¹ = 1 := by
   apply inv_eq_of_mul_eq_one_left
-  sorry
+  rw [one_mul]
 
 @[simp]
 theorem inv_inv (a : G) : a⁻¹⁻¹ = a := by
-  sorry
+  apply inv_eq_of_mul_eq_one_left
+  rw [mul_inv_self]
 
 /-- 積の逆元は逆元をひっくり返した積。 -/
 @[simp]
 theorem mul_inv_rev {a b : G} : (a * b)⁻¹ = b⁻¹ * a⁻¹ := by
-  sorry
+  apply inv_eq_of_mul_eq_one_left
+  rw [mul_assoc]
+  simp only [inv_mul_cancel_left, inv_mul_self]
 
 theorem mul_inv_eq_iff_eq_mul {a b c : G} : a * b⁻¹ = c ↔ a = c * b := by
   -- ヒント: `constructor`でゴールを分けよう
-  sorry
+  constructor
+  . intro h
+    rw [← h, mul_assoc]
+    simp only [inv_mul_self, mul_one]
+  . intro h
+    rw [h, mul_assoc]
+    simp only [mul_inv_self, mul_one]
+  done
 
 theorem mul_inv_eq_one {a b : G} : a * b⁻¹ = 1 ↔ a = b := by
-  sorry
+  constructor
+  . intro h
+    rw [← inv_inv b]
+    apply eq_inv_of_mul_eq_one_left h
+  . intro h
+    rw [h]
+    simp only [mul_inv_self]
+  done
 
 theorem inv_mul_eq_one {a b : G} : a⁻¹ * b = 1 ↔ a = b := by
-  sorry
+  constructor
+  . intro h
+    calc
+      a = a * 1         := by simp only [mul_one]
+      _ = a * (a⁻¹ * b) := by rw [← h]
+      _ = b             := by simp only [mul_inv_cancel_left]
+  . intro h
+    rw [h]
+    simp only [inv_mul_self]
+  done
 
 end Section1
 
