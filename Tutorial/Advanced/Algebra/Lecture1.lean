@@ -119,11 +119,12 @@ example (a b : G) : (a * b)⁻¹ * (a * b) = 1 := by
 theorem inv_mul_cancel_left (a b : G) : a⁻¹ * (a * b) = b := by
   calc
     a⁻¹ * (a * b) = (a⁻¹ * a) * b := by
-      simp only [inv_mul_self, one_mul]
+      simp only [← mul_assoc, inv_mul_self, one_mul]
     _ = 1 * b := by
       simp only [inv_mul_self, one_mul]
     _ = b := by
       simp only [one_mul]
+
 
 /-
 まずは`1`が右単位元でもあることを見ていきたい。
