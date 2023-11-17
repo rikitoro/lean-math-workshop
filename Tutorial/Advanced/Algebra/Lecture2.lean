@@ -220,10 +220,29 @@ namespace GroupHom
 theorem ker_eq_bot : f.ker = ⊥ ↔ Function.Injective f := by
   rw [injective_iff_map_eq_one]
   constructor
-  · sorry
+  · simp only
+    intro h a h'
+    have h'' : a ∈ ker f := by
+      simp only [mem_ker]
+      apply h'
+    rw [h] at h''
+    rw [mem_bot] at h''
+    apply h''
   · -- 2つの部分群が等しいことを示したいときは、`ext a`を使うと、元を取って比較できる。
-    sorry
-
+    simp only
+    intro h
+    ext a
+    constructor
+    . intro h'
+      simp only [mem_bot]
+      apply h
+      apply h'
+    . intro h'
+      simp only [mem_ker]
+      simp only [mem_bot] at h'
+      rw [h']
+      simp only [map_one]
+  done
 /-- 群準同型の像が全体なことと全射なことは同値。 -/
 theorem range_eq_top : f.range = ⊤ ↔ Function.Surjective f := by
   constructor
