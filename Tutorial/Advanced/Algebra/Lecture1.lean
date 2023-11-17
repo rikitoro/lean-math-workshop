@@ -58,11 +58,11 @@ example : Group ℤ where
   inv := fun x ↦ - x
   mul_assoc := by
     -- ヒント: `apply?`で必要なものを見つけよう
-    sorry
+    apply? says exact fun a b c ↦ Int.add_assoc a b c
   one_mul := by
-    sorry
+    apply? says exact fun a ↦ Int.zero_add a
   mul_inv_left := by
-    sorry
+    apply? says exact fun a ↦ Int.add_left_neg a
 
 -- 環`A`の可逆元全体`Aˣ`は積について群になる
 variable [Ring A]
@@ -72,11 +72,11 @@ example : Group Aˣ where
   one := 1
   inv := fun a ↦ a⁻¹
   mul_assoc := by
-    sorry
+    exact mul_assoc
   one_mul := by
-    sorry
+    exact one_mul
   mul_inv_left := by
-    sorry
+    apply? says exact mul_left_inv
 
 --以下この節では`G`を群とする。
 variable [Group G]
@@ -112,18 +112,18 @@ example (a b : G) : (a * b)⁻¹ * (a * b) = 1 := by
   -- `simp`を使ってみよう。すると
   -- 自動的に`inv_mul_self`が使われて証明が終わる。
   -- `simp?`にすると使われた定理が分かる。
-  sorry
+  simp? says simp only [inv_mul_self]
 
 -- 後々のためにもう1つ`simp`を追加。証明中でも`simp`を積極的に使おう。
 @[simp]
 theorem inv_mul_cancel_left (a b : G) : a⁻¹ * (a * b) = b := by
   calc
     a⁻¹ * (a * b) = (a⁻¹ * a) * b := by
-      sorry
+      simp only [inv_mul_self, one_mul]
     _ = 1 * b := by
-      sorry
+      simp only [inv_mul_self, one_mul]
     _ = b := by
-      sorry
+      simp only [one_mul]
 
 /-
 まずは`1`が右単位元でもあることを見ていきたい。
@@ -133,7 +133,14 @@ theorem inv_mul_cancel_left (a b : G) : a⁻¹ * (a * b) = b := by
 theorem mul_left_cancel (a : G) {x y : G} : a * x = a * y → x = y := by
   -- ヒント: `intro h`してから上のように`calc`で変形しよう
   -- （`calc`を使わず`rw`のみの縛りプレイでも可能）
-  sorry
+  intro h
+  calc
+    x = a⁻¹ * (a * x) := by
+      simp only [inv_mul_cancel_left]
+    _ = a⁻¹ * (a * y) := by
+      rw [h]
+    _ = y             := by
+      simp only [inv_mul_cancel_left]
 
 /-- `1`は右単位元でもある。 -/
 @[simp]
@@ -145,18 +152,20 @@ theorem mul_one (a : G) : a * 1 = a := by
   `foo`として何を使えばいいだろうか？
   その後は積極的に`simp`を使おう。
   -/
-  sorry
+  apply mul_left_cancel a⁻¹
+  simp only [inv_mul_cancel_left, inv_mul_self]
 
 -- `a⁻¹`が`a`の右逆元でもあること
 @[simp]
 theorem mul_inv_self (a : G) : a * a⁻¹ = 1 := by
-  sorry
+  apply mul_left_cancel a⁻¹
+  simp only [inv_mul_cancel_left, mul_one]
 
 -- いろいろ便利なので練習も兼ねて`simp`を追加。
 @[simp]
 theorem mul_inv_cancel_left (a b : G) : a * (a⁻¹ * b) = b := by
   rw [← mul_assoc]
-  sorry
+  rw [mul_inv_self, one_mul]
 
 @[simp]
 theorem mul_inv_cancel_right (a b : G) : a * b * b⁻¹ = a := by
