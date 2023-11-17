@@ -243,15 +243,26 @@ theorem ker_eq_bot : f.ker = ⊥ ↔ Function.Injective f := by
       rw [h']
       simp only [map_one]
   done
+
 /-- 群準同型の像が全体なことと全射なことは同値。 -/
 theorem range_eq_top : f.range = ⊤ ↔ Function.Surjective f := by
   constructor
   · intro hrange y
     have hy : y ∈ (⊤ : Subgroup G₂) := by
-      sorry
-    sorry
+      apply mem_top
+    rw [← hrange, mem_range] at hy
+    apply hy
   · intro hsurj
-    sorry
+    ext y
+    constructor
+    . intro _
+      obtain ⟨a, ha⟩ := hsurj y
+      rw [← ha]
+      apply mem_top
+    . intro _
+      apply hsurj
+
+  done
 
 end GroupHom
 
