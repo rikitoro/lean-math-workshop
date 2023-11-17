@@ -44,14 +44,17 @@ theorem map_mul {a b : G₁} : f (a * b) = f a * f b := f.map_mul' a b
 @[simp]
 theorem map_one : f 1 = 1 := by
   have h : f 1 * f 1 = f 1 * 1 := by
-    sorry
-  sorry
+    rw [← map_mul, one_mul, mul_one]
+  apply mul_left_cancel $ f 1
+  apply h
 
 #check eq_inv_of_mul_eq_one_left -- これが使えるかも
 /-- 群準同型は逆元を保つ。 -/
 @[simp]
 theorem map_inv {a : G₁} : f (a⁻¹) = (f a)⁻¹ := by
-  sorry
+  apply eq_inv_of_mul_eq_one_left
+  rw [← map_mul]
+  simp only [inv_mul_self, map_one]
 
 /--
 2つの群準同型`f₁ : G₁ →* G₂`と`f₂ : G₂ →* G₃`の合成`f₂ ∘ f₁`も準同型。
@@ -61,19 +64,19 @@ def GroupHom.comp [Group G₁] [Group G₂] [Group G₃]
   toFun := f₂ ∘ f₁
   map_mul' := by
     -- ヒント: まずは`simp`を試そう
-    sorry
+    simp? says simp only [Function.comp_apply, map_mul, forall_const]
 
 -- 恒等写像は準同型
 def GroupHom.id (G) [Group G] : G →* G where
   toFun := fun a ↦ a
   map_mul' := by
-    sorry
+    simp? says simp only [forall_const]
 
 -- 全てを`1`に飛ばす写像は準同型
 def GroupHom.one : G₁ →* G₂ where
   toFun := fun _ ↦ 1
   map_mul' := by
-    sorry
+    simp? says simp only [mul_one, forall_const]
 
 end Section1
 
@@ -118,7 +121,7 @@ def ker (f : G₁ →* G₂) : Subgroup G₁ where
 
 /-- 核に入ることと飛ばして`1`に行くことは同値。 -/
 @[simp]
-theorem mem_ker {f : G₁ →* G₂} {a : G₁} : a ∈ f.ker ↔ f a = 1 := Iff.rfl 
+theorem mem_ker {f : G₁ →* G₂} {a : G₁} : a ∈ f.ker ↔ f a = 1 := Iff.rfl
 
 /-- 像に入ることの定義の確認。 -/
 @[simp]
@@ -177,7 +180,7 @@ variable {f : G₁ →* G₂}
 theorem injective_iff_map_eq_one : Function.Injective f ↔ (∀ a, f a = 1 → a = 1) := by
   constructor
   · sorry
-  · sorry 
+  · sorry
 
 namespace GroupHom
 
