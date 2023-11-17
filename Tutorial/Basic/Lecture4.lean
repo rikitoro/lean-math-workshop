@@ -14,7 +14,7 @@ variable {X Y Z : Type}
 これは以下のように定義できる。
 -/
 def Injective (f : X → Y) : Prop :=
-  ∀ {x₁ x₂ : X}, f x₁ = f x₂ → x₁ = x₂ 
+  ∀ {x₁ x₂ : X}, f x₁ = f x₂ → x₁ = x₂
 
 -- mathlibには既に単射を表す`Function.Injective f`がある。
 -- 上の定義はこれと同じである。実用では`Function.Injective f`を使おう。
@@ -23,7 +23,9 @@ example : Injective f ↔ Function.Injective f := Iff.rfl
 example : Injective (fun x : ℕ ↦ x + 1) := by
   -- ヒント: `rw [Injective]`をすると単射の定義に戻れる
   -- 積極的に`simp`や`apply?`等のチートコマンドを使おう！
-  sorry
+  rw [Injective]
+  intro x₁ x₂ h
+  apply? says exact Iff.mp Nat.succ_inj' h
 
 /-
 2つの単射の合成は単射。
@@ -32,7 +34,7 @@ example : Injective (fun x : ℕ ↦ x + 1) := by
 人間はこういうミスをよくするが、Leanは「合成できません」とエラーを出してくる。
 Leanの便利なところの一つでもある。
 -/
-theorem Injective.comp {f : X → Y} {g : Y → Z} (hfinj : Injective f) (hginj : Injective g) : 
+theorem Injective.comp {f : X → Y} {g : Y → Z} (hfinj : Injective f) (hginj : Injective g) :
     Injective (g ∘ f) := by
   rw [Injective]
   intro x₁ x₂ hgf
@@ -40,7 +42,9 @@ theorem Injective.comp {f : X → Y} {g : Y → Z} (hfinj : Injective f) (hginj 
   -- 次のように`have`を使おう。
   have hf := hginj hgf
   -- すると `hf: f x₁ = f x₂`が使える。下の補足も参照。
-  sorry
+  apply hfinj
+  apply hf
+
 
 /-
 *補足*
@@ -63,7 +67,9 @@ example {f : X → Y} {g : Y → Z} (hfinj : Injective f) (hginj : Injective g) 
   rw [Injective]
   intro x₁ x₂ hgf
   apply hfinj -- なぜ`apply`でこう書き換わるか考えよう
-  sorry
+  apply hginj
+  apply hgf
+
 
 -- 合成して単射なら先の写像は単射
 theorem Injective.of_comp {f : X → Y} {g : Y → Z} (hgfinj : Injective (g ∘ f)) : Injective f := by
@@ -73,8 +79,9 @@ theorem Injective.of_comp {f : X → Y} {g : Y → Z} (hgfinj : Injective (g ∘
   -- 以下のように、`have name : 示したいこと := by`と書ける。
   -- その後のインデントに注意。
   have h : g (f x₁) = g (f x₂) := by
-    sorry
-  sorry
+    rw [hf]
+  apply hgfinj h
+
 
 -- 強いチートコマンドを使った別解
 example {f : X → Y} {g : Y → Z} (hgfinj : Injective (g ∘ f)) : Injective f := by
@@ -110,7 +117,10 @@ example : Surjective f ↔ Function.Surjective f := Iff.rfl
 example : Surjective (fun x : ℤ ↦ x + 1) := by
   -- `apply?`等のチートコマンドを使ってもいいし、
   -- Lecture 3で学んだ`exists`を使ってもいい
-  sorry
+  unfold Surjective
+  intro y
+  use y - 1
+  simp
 
 -- 以下`f`は`X`から`Y`への写像、`g`は`Y`から`Z`の写像とする。
 variable {f : X → Y} {g : Y → Z}
@@ -123,7 +133,10 @@ theorem Surjective.comp (hfsurj : Surjective f) (hgsurj : Surjective g) : Surjec
   -- これはLecture3で見たように、次で取れる。
   -- 下の補足も参照。
   have ⟨y, hy⟩ := hgsurj z
-  sorry
+  obtain ⟨x, hx⟩ := hfsurj y
+  use x
+  simp
+  rw [hx, hy]
 
 /-
 *補足*
@@ -135,10 +148,14 @@ theorem Surjective.comp (hfsurj : Surjective f) (hgsurj : Surjective g) : Surjec
 
 -- 合成して全射なら後ろの写像は全射
 theorem Surjective.of_comp (h : Surjective (g ∘ f)) : Surjective g := by
-  sorry
+  intro z
+  obtain ⟨x, hx⟩ := h z
+  use f x
+  apply hx
+
 
 end Tutorial
 
-/-  
+/-
 Basicチュートリアルは以上です。Advancedチュートリアルではより実践的な数学を扱います。
 -/
