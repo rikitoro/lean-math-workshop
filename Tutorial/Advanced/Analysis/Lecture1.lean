@@ -197,10 +197,11 @@ theorem HasDerivAt.isBigO_sub (h : HasDerivAt f f' a) :
     _ =O[𝓝 a] fun x ↦ x - a  := ?eq2
   case eq1 =>
     -- ヒント: 関数の間の等号を示したいときは`funext`を使おう
-    sorry
+    funext x
+    rw [mul_comm]
   case eq2 =>
     -- ヒント: `apply?`を使って必要な命題を探せる
-    sorry
+    exact isBigO_const_mul_self f' fun x ↦ x - a
 
 /-- 微分可能ならば連続 -/
 theorem HasDerivAt.continuousAt (h : HasDerivAt f f' a) :
