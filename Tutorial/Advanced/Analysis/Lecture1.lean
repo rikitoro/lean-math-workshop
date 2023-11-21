@@ -259,25 +259,30 @@ theorem HasDerivAt.mul {f : ℝ → ℝ} (hf : HasDerivAt f f' a) (hg : HasDeriv
           (f a * (g x - g a - (x - a) * g') + (f x - f a) * (g x - g a)) := ?eq1
     _ =o[𝓝 a] fun x ↦ x - a                                             := ?eq2
   case eq1 =>
-    sorry
+    funext x
+    linarith
   case eq2 =>
-    have hf' : (fun x ↦ g a * (f x - f a - (x - a) * f')) =o[𝓝 a] fun x ↦ x - a :=
-      sorry
-    have hg' : (fun x ↦ f a * (g x - g a - (x - a) * g')) =o[𝓝 a] fun x ↦ x - a :=
-      sorry
+    have hf' : (fun x ↦ g a * (f x - f a - (x - a) * f')) =o[𝓝 a] fun x ↦ x - a := by
+      apply IsLittleO.const_mul_left hf
+    have hg' : (fun x ↦ f a * (g x - g a - (x - a) * g')) =o[𝓝 a] fun x ↦ x - a := by
+      apply IsLittleO.const_mul_left hg
     have hfg :=
       calc (fun x ↦ (f x - f a) * (g x - g a))
         _ =o[𝓝 a] fun x ↦ (x - a) * 1      := ?eq3
         _ = fun x ↦ x - a                   := ?eq4
-    sorry
+    apply Asymptotics.IsLittleO.add hf'
+    exact IsLittleO.add hg' hfg
     case eq3 =>
       have hg'' : (fun x ↦ g x - g a) =o[𝓝 a] fun _ ↦ (1 : ℝ) := by
         rw [Asymptotics.isLittleO_one_iff, tendsto_sub_nhds_zero_iff]
-        sorry
+        exact continuousAt hg
       -- `IsBigO.mul_isLittleO`が使える
-      sorry
+      apply IsBigO.mul_isLittleO
+      apply isBigO_sub hf
+      apply hg''
     case eq4 =>
-      sorry
+      funext x
+      linarith
 
 -- 次の問題で使うかも？
 #check Nat.succ_eq_add_one
