@@ -235,15 +235,17 @@ theorem HasDerivAt.comp (hf : HasDerivAt f f' a) (hg : HasDerivAt g g' (f a)) :
   apply h₁.triangle h₂
   case eq1 =>
     -- `IsLittleO.comp_tendsto`が使える
-    sorry
+    apply IsLittleO.comp_tendsto hg
+    exact continuousAt hf
   case eq2 =>
-    sorry
+    exact isBigO_sub hf
   case eq3 =>
-    sorry
+    funext x
+    linarith
   case eq4 =>
-    sorry
+    exact isBigO_const_mul_self g' fun x ↦ f x - f a - (x - a) * f'
   case eq5 =>
-    sorry
+    exact hf
 
 -- 次の問題で使うかも？
 #check IsLittleO.const_mul_left
